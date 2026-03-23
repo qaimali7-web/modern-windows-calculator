@@ -23,7 +23,9 @@ export function handlePadClick(e) {
   const btn = e.currentTarget;
   const action = btn.dataset.action;
   const value = btn.dataset.value;
+
   if (action === 'clear-all') return clearAll();
+
   if (action === 'toggle-sign') {
     if (state.current || state.result) {
       let num = state.result || state.current;
@@ -39,6 +41,7 @@ export function handlePadClick(e) {
     }
     return;
   }
+
   if (action === 'percent') {
     if (state.current || state.result) {
       let num = state.result || state.current;
@@ -54,6 +57,7 @@ export function handlePadClick(e) {
     }
     return;
   }
+
   if (action === 'decimal') {
     if (!state.current.includes('.') && !state.result) {
       state.current += state.current ? '.' : '0.';
@@ -62,10 +66,13 @@ export function handlePadClick(e) {
     }
     return;
   }
+
   if (['add', 'subtract', 'multiply', 'divide'].includes(action)) {
     if (state.current || state.result) {
       let num = state.result || state.current;
-      state.expression += (state.expression ? ' ' : '') + num + ' ' + btn.textContent.trim();
+      // Always use safe ASCII operators in the expression string
+      const opSymbols = { add: '+', subtract: '-', multiply: '*', divide: '/' };
+      state.expression += (state.expression ? ' ' : '') + num + ' ' + opSymbols[action];
       state.current = '';
       state.result = '';
       state.displayValue = num;
@@ -73,17 +80,12 @@ export function handlePadClick(e) {
     }
     return;
   }
+
   if (action === 'equals') {
     if (state.current || state.expression) {
-      let expr = (state.expression + (state.current ? ' ' + state.current : ''))
-        .replace(/×/g, '*')
-        .replace(/÷/g, '/')
-        .replace(/＋/g, '+')   // full-width plus
-        .replace(/－/g, '-')   // full-width minus
-        .replace(/,/g, '');
+      let expr = (state.expression + (state.current ? ' ' + state.current : '')).trim();
       console.log('Evaluating expression:', expr);
       try {
-        // Use evaluateExpression from electronAPI (exposed via preload)
         if (window.electronAPI && typeof window.electronAPI.evaluateExpression === 'function') {
           const result = window.electronAPI.evaluateExpression(expr);
           console.log('Evaluation result:', result);
@@ -104,6 +106,7 @@ export function handlePadClick(e) {
     }
     return;
   }
+
   // Number input
   if (value !== undefined) {
     if (state.result) {
