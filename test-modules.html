@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Module Test</title>
+</head>
+<body>
+    <div id="display">0</div>
+    <div id="expression"></div>
+    <div id="test-output"></div>
+    
+    <script type="module">
+        const output = document.getElementById('test-output');
+        
+        // Test 1: Check if ES modules are supported
+        output.innerHTML += '<p>ES modules supported: Yes</p>';
+        
+        // Test 2: Try to import state.js
+        try {
+            import('./src/state.js').then(module => {
+                output.innerHTML += '<p>state.js import: SUCCESS</p>';
+                console.log('State module:', module);
+            }).catch(err => {
+                output.innerHTML += `<p>state.js import: FAILED - ${err.message}</p>`;
+                console.error('State import error:', err);
+            });
+        } catch (err) {
+            output.innerHTML += `<p>state.js import syntax error: ${err.message}</p>`;
+        }
+        
+        // Test 3: Try to import calculator-ui.js
+        try {
+            import('./src/calculator-ui.js').then(module => {
+                output.innerHTML += '<p>calculator-ui.js import: SUCCESS</p>';
+                console.log('Calculator UI module:', module);
+            }).catch(err => {
+                output.innerHTML += `<p>calculator-ui.js import: FAILED - ${err.message}</p>`;
+                console.error('Calculator UI import error:', err);
+            });
+        } catch (err) {
+            output.innerHTML += `<p>calculator-ui.js import syntax error: ${err.message}</p>`;
+        }
+        
+        // Test 4: Check window.electronAPI
+        output.innerHTML += `<p>window.electronAPI exists: ${typeof window.electronAPI !== 'undefined'}</p>`;
+        if (window.electronAPI) {
+            output.innerHTML += `<p>window.electronAPI.evaluateExpression exists: ${typeof window.electronAPI.evaluateExpression !== 'undefined'}</p>`;
+        }
+        
+        // Test 5: Check DOM elements at load time
+        const displayEl = document.getElementById('display');
+        output.innerHTML += `<p>Display element found at module load: ${!!displayEl}</p>`;
+    </script>
+</body>
+</html>

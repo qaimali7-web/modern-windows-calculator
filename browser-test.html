@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Browser Test</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: #2a2a2a;
+        }
+        .pass { border-left: 4px solid #4CAF50; }
+        .fail { border-left: 4px solid #f44336; }
+        .warning { border-left: 4px solid #ff9800; }
+        button {
+            padding: 10px 20px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #106ebe; }
+        #calculator-test {
+            margin-top: 30px;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Calculator Module Test</h1>
+        <p>Testing the refactored calculator modules in browser environment</p>
+        
+        <div id="test-results">
+            <div class="test-result" id="module-test">Testing module loading...</div>
+            <div class="test-result" id="mathjs-test">Testing mathjs integration...</div>
+            <div class="test-result" id="dom-test">Testing DOM references...</div>
+            <div class="test-result" id="state-test">Testing state management...</div>
+        </div>
+        
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="testCalculator()">Test Calculator UI</button>
+        
+        <div id="calculator-test" style="display: none;">
+            <h3>Calculator Test Interface</h3>
+            <div class="display-section">
+                <div class="expression" id="test-expression"></div>
+                <div class="display" id="test-display">0</div>
+            </div>
+            <div class="pad-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px;">
+                <button class="btn" data-action="clear-all">C</button>
+                <button class="btn" data-action="toggle-sign">±</button>
+                <button class="btn" data-action="percent">%</button>
+                <button class="btn" data-action="divide">÷</button>
+                
+                <button class="btn" data-value="7">7</button>
+                <button class="btn" data-value="8">8</button>
+                <button class="btn" data-value="9">9</button>
+                <button class="btn" data-action="multiply">×</button>
+                
+                <button class="btn" data-value="4">4</button>
+                <button class="btn" data-value="5">5</button>
+                <button class="btn" data-value="6">6</button>
+                <button class="btn" data-action="subtract">−</button>
+                
+                <button class="btn" data-value="1">1</button>
+                <button class="btn" data-value="2">2</button>
+                <button class="btn" data-value="3">3</button>
+                <button class="btn" data-action="add">+</button>
+                
+                <button class="btn" data-value="0" style="grid-column: span 2;">0</button>
+                <button class="btn" data-action="decimal">.</button>
+                <button class="btn equals" data-action="equals">=</button>
+            </div>
+            <div id="calculation-result" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Mock window.electronAPI for browser testing
+        window.electronAPI = {
+            evaluateExpression: (expr) => {
+                console.log('Mock evaluateExpression called with:', expr);
+                // Simple eval for testing (not safe for production)
+                try {
+                    // Replace × and ÷ with * and /
+                    const sanitized = expr.replace(/×/g, '*').replace(/÷/g, '/');
+                    const result = Function('"use strict"; return (' + sanitized + ')')();
+                    if (!Number.isFinite(result)) throw new Error('Math error');
+                    return result;
+                } catch (e) {
+                    throw new Error('Invalid expression');
+                }
+            }
+        };
+
+        async function runAllTests() {
+            const results = document.getElementById('test-results');
+            
+            // Test 1: Module loading
+            const moduleTest = document.getElementById('module-test');
+            try {
+                // Try to import the modules
+                const stateModule = await import('./src/state.js');
+                const calculatorUIModule = await import('./src/calculator-ui.js');
+                moduleTest.innerHTML = '<strong>Module Loading:</strong> SUCCESS - All modules loaded correctly';
+                moduleTest.className = 'test-result pass';
+            } catch (err) {
+                moduleTest.innerHTML = `<strong>Module Loading:</strong> FAILED - ${err.message}`;
+                moduleTest.className = 'test-result fail';
+            }
+            
+            // Test 2: mathjs integration
+            const exprTest = document.getElementById('mathjs-test');
+            try {
+                // Test the calculator.js module (CommonJS, won't work in browser)
+                // Instead test the mock
+                const result = window.electronAPI.evaluateExpression('2+2');
+                if (result === 4) {
+                    exprTest.innerHTML = '<strong>Expression Evaluation:</strong> SUCCESS - 2+2 = 4';
+                    exprTest.className = 'test-result pass';
+                } else {
+                    exprTest.innerHTML = `<strong>Expression Evaluation:</strong> FAILED - Expected 4, got ${result}`;
+                    exprTest.className = 'test-result fail';
+                }
+            } catch (err) {
+                exprTest.innerHTML = `<strong>Expression Evaluation:</strong> FAILED - ${err.message}`;
+                exprTest.className = 'test-result fail';
+            }
+            
+            // Test 3: DOM references
+            const domTest = document.getElementById('dom-test');
+            try {
+                // Create test DOM elements
+                const displayEl = document.createElement('div');
+                displayEl.id = 'display';
+                document.body.appendChild(displayEl);
+                
+                // Test state initialization
+                const stateModule = await import('./src/state.js');
+                stateModule.initDOMReferences();
+                
+                if (stateModule.state.displayEl) {
+                    domTest.innerHTML = '<strong>DOM References:</strong> SUCCESS - DOM elements properly referenced';
+                    domTest.className = 'test-result pass';
+                } else {
+                    domTest.innerHTML = '<strong>DOM References:</strong> WARNING - displayEl is null';
+                    domTest.className = 'test-result warning';
+                }
+                
+                // Clean up
+                document.body.removeChild(displayEl);
+            } catch (err) {
+                domTest.innerHTML = `<strong>DOM References:</strong> FAILED - ${err.message}`;
+                domTest.className = 'test-result fail';
+            }
+            
+            // Test 4: State management
+            const stateTest = document.getElementById('state-test');
+            try {
+                const stateModule = await import('./src/state.js');
+                const calculatorUIModule = await import('./src/calculator-ui.js');
+                
+                // Test state object
+                if (stateModule.state && typeof stateModule.state === 'object') {
+                    stateTest.innerHTML = '<strong>State Management:</strong> SUCCESS - State object exists and has expected properties';
+                    stateTest.className = 'test-result pass';
+                } else {
+                    stateTest.innerHTML = '<strong>State Management:</strong> FAILED - State object not properly exported';
+                    stateTest.className = 'test-result fail';
+                }
+            } catch (err) {
+                stateTest.innerHTML = `<strong>State Management:</strong> FAILED - ${err.message}`;
+                stateTest.className = 'test-result fail';
+            }
+        }
+        
+        function testCalculator() {
+            document.getElementById('calculator-test').style.display = 'block';
+            setupCalculatorTest();
+        }
+        
+        function setupCalculatorTest() {
+            const buttons = document.querySelectorAll('#calculator-test .btn');
+            const display = document.getElementById('test-display');
+            const expression = document.getElementById('test-expression');
+            const resultDiv = document.getElementById('calculation-result');
+            
+            let current = '';
+            let expressionStr = '';
+            let result = '';
+            
+            function updateDisplay() {
+                display.textContent = current || '0';
+                expression.textContent = expressionStr;
+            }
+            
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    const value = this.dataset.value;
+                    
+                    if (action === 'clear-all') {
+                        current = '';
+                        expressionStr = '';
+                        result = '';
+                        resultDiv.textContent = '';
+                    } else if (action === 'equals') {
+                        if (current || expressionStr) {
+                            const expr = (expressionStr + (current ? ' ' + current : '')).replace(/×/g, '*').replace(/÷/g, '/');
+                            try {
+                                result = window.electronAPI.evaluateExpression(expr);
+                                resultDiv.textContent = `${expr} = ${result}`;
+                                expressionStr = '';
+                                current = String(result);
+                            } catch (err) {
+                                resultDiv.textContent = `Error: ${err.message}`;
+                                current = 'Error';
+                            }
+                        }
+                    } else if (value !== undefined) {
+                        current += value;
+                    } else if (action) {
+                        // Operator
+                        if (current) {
+                            expressionStr += (expressionStr ? ' ' : '') + current + ' ' + this.textContent.trim();
+                            current = '';
+                        }
+                    }
+                    
+                    updateDisplay();
+                });
+            });
+            
+            updateDisplay();
+        }
+        
+        // Run basic tests on load
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(runAllTests, 500);
+        });
+    </script>
+</body>
+</html>

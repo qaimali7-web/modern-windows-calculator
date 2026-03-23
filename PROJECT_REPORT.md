@@ -100,7 +100,7 @@ modern-windows-calculator/
 
 ### 1. **Security Concerns**
 - **`new Function()` Usage:** While sanitized, using `Function` constructor for evaluation is risky
-- **Recommendation:** Consider using a safer math expression parser library (e.g., `math.js`, `expr-eval`)
+- **Recommendation:** Consider using a safer math expression parser library (e.g., `math.js`)
 
 ### 2. **Code Duplication**
 - **`calculator.js` and `renderer.js` both contain `sanitize()` and `evaluateExpression()` functions

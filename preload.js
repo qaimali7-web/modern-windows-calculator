@@ -1,6 +1,6 @@
 const { contextBridge } = require('electron');
+const { evaluateExpression } = require('./src/calculator');
 
 contextBridge.exposeInMainWorld('electronAPI', {
-  // placeholder in case we want to expose native features later
-  ping: () => 'pong'
+  evaluateExpression: (expr) => evaluateExpression(expr)
 });
