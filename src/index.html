@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+
+    <div class="app">
+      <nav class="sidebar" id="sidebar">
+        <div class="logo">
+          <span>CALCUX</span>
+        </div>
+        <div class="nav-group">
+          <button class="nav-item active" data-mode="standard"><span class="icon">&#9633;</span> Standard</button>
+          <button class="nav-item" data-mode="scientific"><span class="icon">&#8721;</span> Scientific</button>
+          <button class="nav-item" data-mode="currency"><span class="icon">&#36;</span> Currency</button>
+          <button class="nav-item" data-mode="unit"><span class="icon">&#128202;</span> Unit Converter</button>
+          <button class="nav-item" data-mode="history"><span class="icon">&#128214;</span> History</button>
+        </div>
+        <div class="nav-group">
+          <span class="nav-group-title">UTILITIES</span>
+          <button class="nav-item" data-mode="finance"><span class="icon">&#128181;</span> Finance & Tax</button>
+          <button class="nav-item" data-mode="settings"><span class="icon">&#9881;</span> Settings</button>
+        </div>
+      </nav>
+
+      <div class="main-area">
+        <div class="calculator-panel">
+          <div class="display-section">
+            <div class="expression" id="expression">2,450 × 12 + 15%</div>
+            <div class="display" id="display">33,810</div>
+          </div>
+          <div class="pad-grid">
+            <button class="btn" data-action="clear-all">AC</button>
+            <button class="btn" data-action="toggle-sign">+/-</button>
+            <button class="btn" data-action="percent">%</button>
+            <button class="btn op" data-action="add">+</button>
+            <button class="btn" data-value="7">7</button>
+            <button class="btn" data-value="8">8</button>
+            <button class="btn" data-value="9">9</button>
+            <button class="btn op" data-action="subtract">-</button>
+            <button class="btn" data-value="4">4</button>
+            <button class="btn" data-value="5">5</button>
+            <button class="btn" data-value="6">6</button>
+            <button class="btn op" data-action="multiply">×</button>
+            <button class="btn" data-value="1">1</button>
+            <button class="btn" data-value="2">2</button>
+            <button class="btn" data-value="3">3</button>
+            <button class="btn op" data-action="divide">÷</button>
+            <button class="btn" data-value="0">0</button>
+            <button class="btn" data-action="decimal">.</button>
+            <button class="btn equals" data-action="equals">=</button>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <section class="quick-convert">
+            <h3>Quick Convert</h3>
+            <div class="convert-fields">
+              <input type="text" id="convert-from" value="1,240" />
+              <select id="convert-from-currency">
+                <option>USD</option>
+                <option>EUR</option>
+                <option>GBP</option>
+              </select>
+              <input type="text" id="convert-to" value="1,142.50" />
+              <select id="convert-to-currency">
+                <option>EUR</option>
+                <option>USD</option>
+                <option>GBP</option>
+              </select>
+            </div>
+            <div class="convert-rate">Rate: 1 USD = 0.92 EUR</div>
+          </section>
+          <section class="recent-calculations">
+            <h3>Recent Calculations</h3>
+            <div class="recent-list">
+              <div class="recent-item">Tax Calculation <span class="recent-exp">15,000 × 8%</span> <span class="recent-result">16,200</span></div>
+              <div class="recent-item">Unit Conversion <span class="recent-exp">85 mi to km</span> <span class="recent-result">136.79</span></div>
+            </div>
+          </section>
+          <section class="active-theme">
+            <h3>Active Theme</h3>
+            <div class="theme-options">
+              <button class="theme-btn dark active" data-theme="dark"></button>
+              <button class="theme-btn light" data-theme="light"></button>
+              <button class="theme-btn green" data-theme="green"></button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
